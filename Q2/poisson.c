@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <math.h>
 
+long double poisson_calc(long double lambda, int k) {
+    // Calculate P(X=k) using the Poisson probability mass function formula
+    long double probability = (long double)exp(-lambda) * powl(lambda, k) / factorial(k);
+    return probability;
+}
+
 int factorial(int n) {
     if (n == 0 || n == 1) {
         return 1;
@@ -20,8 +26,8 @@ int main(int argc, char *argv[]) {
     long double lambda = strtold(argv[1], NULL);
     int k = atoi(argv[2]);
 
-    // Calculate P(X=k) using the Poisson probability mass function formula
-    long double probability = (long double)exp(-lambda) * powl(lambda, k) / factorial(k);
+    // Calculate Poisson probability
+    long double probability = poisson_calc(lambda, k);
 
     printf("P(X=%d) = %.20Lf\n", k, probability);
 
