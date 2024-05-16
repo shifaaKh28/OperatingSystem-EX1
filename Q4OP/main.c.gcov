@@ -1,0 +1,76 @@
+        -:    0:Source:main.c
+        -:    0:Graph:main.gcno
+        -:    0:Data:main.gcda
+        -:    0:Runs:6
+        -:    1:#include <limits.h>
+        -:    2:#include <stdbool.h>
+        -:    3:#include <stdio.h>
+        -:    4:#include <stdlib.h>
+        -:    5:
+       10:    6:int minDistance(int dist[], bool sptSet[], int n) {
+       10:    7:    int min = INT_MAX, min_index;
+        -:    8:
+       46:    9:    for (int v = 0; v < n; v++)
+       36:   10:        if (sptSet[v] == false && dist[v] <= min)
+       14:   11:            min = dist[v], min_index = v;
+        -:   12:
+       10:   13:    return min_index;
+        -:   14:}
+        -:   15:
+        4:   16:void printSolution(int dist[], int n) {
+        4:   17:    printf("Vertex \t\t Distance from Source\n");
+       18:   18:    for (int i = 0; i < n; i++)
+       14:   19:        printf("%d \t\t\t\t %d\n", i, dist[i]);
+        4:   20:}
+        -:   21:
+        4:   22:void dijkstra(int **graph, int src, int n) {
+        4:   23:    int *dist = (int *)malloc(n * sizeof(int));
+        4:   24:    bool *sptSet = (bool *)malloc(n * sizeof(bool));
+        -:   25:
+       18:   26:    for (int i = 0; i < n; i++)
+       14:   27:        dist[i] = INT_MAX, sptSet[i] = false;
+        -:   28:
+        4:   29:    dist[src] = 0;
+        -:   30:
+       14:   31:    for (int count = 0; count < n - 1; count++) {
+       10:   32:        int u = minDistance(dist, sptSet, n);
+        -:   33:
+       10:   34:        sptSet[u] = true;
+        -:   35:
+       46:   36:        for (int v = 0; v < n; v++)
+       36:   37:            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX && dist[u] + graph[u][v] < dist[v])
+        8:   38:                dist[v] = dist[u] + graph[u][v];
+        -:   39:    }
+        -:   40:
+        -:   41:    // print the constructed distance array
+        4:   42:    printSolution(dist, n);
+        -:   43:
+        4:   44:    free(dist);
+        4:   45:    free(sptSet);
+        4:   46:}
+        -:   47:
+        6:   48:int main() {
+        -:   49:    int rows, cols;
+        6:   50:    scanf("%d %d", &rows, &cols);
+        -:   51:
+        6:   52:    int **graph = (int **)malloc(rows * sizeof(int *));
+       21:   53:    for (int i = 0; i < rows; i++) {
+       17:   54:        graph[i] = (int *)malloc(cols * sizeof(int));
+       71:   55:        for (int j = 0; j < cols; j++) {
+       56:   56:            scanf("%d", &graph[i][j]);
+       56:   57:            if (graph[i][j] < 0) {
+        2:   58:                fprintf(stderr, "Invalid input: Negative arc weight detected.\n");
+        2:   59:                exit(1);
+        -:   60:            }
+        -:   61:        }
+        -:   62:    }
+        -:   63:
+        4:   64:    dijkstra(graph, 0, rows);
+        -:   65:
+        -:   66:    // Free memory for the graph
+       18:   67:    for (int i = 0; i < rows; i++)
+       14:   68:        free(graph[i]);
+        4:   69:    free(graph);
+        -:   70:
+        4:   71:    return 0;
+        -:   72:}
