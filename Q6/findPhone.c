@@ -1,3 +1,80 @@
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <unistd.h>
+// #include <sys/wait.h>
+// #include <fcntl.h>
+
+// #define PHONEBOOK "phonebook.txt"
+
+// int main(int argc, char *argv[]) {
+//     // Check if the correct number of arguments is provided
+//     if (argc < 2) {
+//         // Print usage information if not enough arguments are provided
+//         fprintf(stderr, "Usage: %s <name>\n", argv[0]);
+//         return 1;
+//     }
+
+//     // Define pipes for inter-process communication
+//     int pipe1[2], pipe2[2];
+
+//     // Create a pipe for communication between processes
+//     pipe(pipe1);
+
+//     // Create a child process to execute the 'cat' command
+//     if (fork() == 0) {
+//         // Child process
+//         dup2(pipe1[1], 1); // Redirect standard output to pipe1
+//         close(pipe1[0]);   // Close unused read end of pipe1
+//         close(pipe1[1]);   // Close write end of pipe1
+//         execlp("cat", "cat", PHONEBOOK, NULL); // Execute 'cat' command
+//         perror("execlp failed"); // Print error if execlp fails
+//         exit(1); // Exit child process with error
+//     }
+
+//     // Close write end of pipe1 in parent process
+//     close(pipe1[1]);
+
+//     // Create a pipe for communication between processes
+//     pipe(pipe2);
+
+//     // Create a child process to execute the 'grep' command
+//     if (fork() == 0) {
+//         // Child process
+//         dup2(pipe1[0], 0); // Redirect standard input from pipe1
+//         dup2(pipe2[1], 1); // Redirect standard output to pipe2
+//         close(pipe1[0]);   // Close read end of pipe1
+//         close(pipe2[0]);   // Close read end of pipe2
+//         close(pipe2[1]);   // Close write end of pipe2
+//         execlp("grep", "grep", argv[1], NULL); // Execute 'grep' command
+//         perror("execlp failed"); // Print error if execlp fails
+//         exit(1); // Exit child process with error
+//     }
+
+//     // Close unused file descriptors in parent process
+//     close(pipe1[0]);
+//     close(pipe2[1]);
+
+//     // Create a child process to execute the 'awk' command
+//     if (fork() == 0) {
+//         // Child process
+//         dup2(pipe2[0], 0); // Redirect standard input from pipe2
+//         close(pipe2[0]);   // Close read end of pipe2
+//         execlp("awk", "awk", "-F,", "{print $2}", NULL); // Execute 'awk' command
+//         perror("execlp failed"); // Print error if execlp fails
+//         exit(1); // Exit child process with error
+//     }
+
+//     // Close read end of pipe2 in parent process
+//     close(pipe2[0]);
+
+//     // Wait for all child processes to finish
+//     for (int i = 0; i < 3; i++) {
+//         wait(NULL);
+//     }
+
+//     return 0; // Return success
+// }
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
