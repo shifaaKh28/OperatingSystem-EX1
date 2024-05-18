@@ -1,77 +1,57 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
-// Main function to add a new entry to the phonebook
 int main(int argc, char *argv[]) {
-    // Check if the correct number of arguments is provided
-    if (argc < 3) {
-        // If not, print usage information and return an error code
-        printf("Usage: %s <name> <phone_number>\n", argv[0]);
+    // Validate the input format
+    if (argc != 2 || argv[1][0] == ',' || argv[1][0] == '\0') {
+        printf("Usage: %s \"<name>,<phone_number>\"\n", argv[0]);
         return 1;
     }
-
-    // Concatenate name parts into a single string
-    char name[256] = ""; // Initialize an empty string to store the name
-    for (int i = 1; i < argc - 1; i++) {
-        strcat(name, argv[i]); // Append each part of the name to the string
-        if (i < argc - 2 || strchr(argv[i], ',') != NULL) {
-            strcat(name, " "); // Add a space between name parts
-        }
-    }
-
-    // Validate the name
-    for (int i = 0; name[i] != '\0'; i++) {
-        // Check if each character in the name is a letter or a space
-        if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z') || name[i] == ' ')) {
-            printf("Invalid input: Name contains invalid characters\n");
-            return 1;
-        }
-    }
-
-    // Extract the phone number
-    char *phone_number;
-    if (argc >= 3) {
-        phone_number = argv[argc - 1]; // The phone number is the last argument
-    } else {
-        printf("Invalid input: Missing phone number\n");
-        return 1;
-    }
-
-    // Check if the phone number contains a comma
-    char *comma_pos = strchr(phone_number, ',');
-    if (comma_pos != NULL) {
-        // If a comma is found, skip it
-        phone_number = comma_pos + 1;
-    }
-
-    // Validate the phone number
-    int hyphen_count = 0; // Counter for hyphens in the phone number
-    for (int i = 0; phone_number[i] != '\0'; i++) {
-        if (phone_number[i] == '-') {
-            hyphen_count++; // Increment hyphen count
-            // Check if there is more than one hyphen
-            if (hyphen_count > 1) {
-                printf("Invalid input: Phone number contains multiple hyphens\n");
-                return 1;
+    
+    // Validate name and phone number
+    int i = 0;
+    int hyphen_count = 0;
+    int name_valid = 0;
+    int phone_valid = 0;
+    
+    // Loop through the input string
+    while (argv[1][i] != '\0') {
+        // Check for name validity
+        if ((argv[1][i] >= 'a' && argv[1][i] <= 'z') || (argv[1][i] >= 'A' && argv[1][i] <= 'Z') || argv[1][i] == ' ') {
+            name_valid = 1;
+        } else if (argv[1][i] == ',') {
+            // Check if the comma is followed by a valid phone number
+            if (argv[1][i + 1] != '\0' && argv[1][i + 1] >= '0' && argv[1][i + 1] <= '9') {
+                phone_valid = 1;
             }
-        } else if (phone_number[i] < '0' || phone_number[i] > '9') {
-            // Check if each character in the phone number is a digit
-            printf("Invalid input: Phone number contains non-numeric characters\n");
-            return 1;
+        } else if (argv[1][i] == '-') {
+            // Count hyphens to validate phone number format
+            hyphen_count++;
+            if (hyphen_count > 1) {
+                phone_valid = 0;
+            }
+        } else if (argv[1][i] < '0' || argv[1][i] > '9') {
+            phone_valid = 0;
         }
+        i++;
     }
-
-    // Write the new entry to the phonebook file
-    FILE *f = fopen("phonebook.txt", "a"); // Open the phonebook file in append mode
+    
+    // Check overall validity
+    if (!name_valid || !phone_valid) {
+        printf("Invalid input\n");
+        return 1;
+    }
+    
+    // Open the file
+    FILE *f = fopen("phonebook.txt", "a");
     if (f == NULL) {
-        // If the file cannot be opened, print an error message
         printf("Error opening file!\n");
         return 1;
     }
-    // Write the name and phone number to the file
-    fprintf(f, "%s,%s\n", name, phone_number);
-    // Close the file
+    
+    // Write to file: name,phone_number
+    fprintf(f, "%s\n", argv[1]);
     fclose(f);
-
-    return 0; // Return success
+    
+    return 0;
 }
