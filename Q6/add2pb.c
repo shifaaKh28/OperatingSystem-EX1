@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     char name[256] = ""; // Initialize an empty string to store the name
     for (int i = 1; i < argc - 1; i++) {
         strcat(name, argv[i]); // Append each part of the name to the string
-        if (i < argc - 2) {
+        if (i < argc - 2 || strchr(argv[i], ',') != NULL) {
             strcat(name, " "); // Add a space between name parts
         }
     }
@@ -28,8 +28,23 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Extract the phone number
+    char *phone_number;
+    if (argc >= 3) {
+        phone_number = argv[argc - 1]; // The phone number is the last argument
+    } else {
+        printf("Invalid input: Missing phone number\n");
+        return 1;
+    }
+
+    // Check if the phone number contains a comma
+    char *comma_pos = strchr(phone_number, ',');
+    if (comma_pos != NULL) {
+        // If a comma is found, skip it
+        phone_number = comma_pos + 1;
+    }
+
     // Validate the phone number
-    char *phone_number = argv[argc - 1]; // The phone number is the last argument
     int hyphen_count = 0; // Counter for hyphens in the phone number
     for (int i = 0; phone_number[i] != '\0'; i++) {
         if (phone_number[i] == '-') {
